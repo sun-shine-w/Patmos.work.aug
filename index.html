@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8월 출근자 명단 (8/4~8/29)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 출근자 표 전용 스타일 */
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .date-row {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .date-row:hover {
+            background-color: #f9fafb;
+        }
+
+        .date-cell {
+            padding: 12px 8px;
+            vertical-align: top;
+            width: 120px;
+            font-weight: bold;
+            background-color: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .attendance-cell {
+            padding: 12px;
+            vertical-align: top;
+        }
+
+        .location-section {
+            margin-bottom: 8px;
+        }
+
+        .location-header {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .location-p {
+            background-color: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .location-b {
+            background-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .employee-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .employee-tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .employee-normal {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .employee-special {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .vacation-info {
+            font-size: 11px;
+            color: #dc2626;
+            margin-top: 6px;
+            font-style: italic;
+            background-color: #fef2f2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border-left: 3px solid #dc2626;
+        }
+
+        .stats-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .weekend-note {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        /* 모바일 최적화 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 8px;
+            }
+            
+            .date-cell {
+                width: 70px;
+                padding: 8px 4px;
+                font-size: 11px;
+            }
+            
+            .attendance-cell {
+                padding: 8px;
+            }
+            
+            .employee-tag {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+            
+            .location-header {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+            
+            .stats-info {
+                font-size: 11px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+            
+            .main-title {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="main-container max-w-6xl mx-auto p-4 sm:p-6">
+        <!-- 헤더 -->
+        <div class="mb-6 text-center">
+            <h1 class="main-title text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+                📋 8월 출근자 명단
+            </h1>
+            <p class="text-sm sm:text-base text-gray-600">2025년 8월 4일 ~ 8월 29일 (평일만)</p>
+            <div class="mt-4 flex items-center justify-center">
+                <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                <span class="text-green-700 font-semibold text-sm">팻머스 실제 데이터</span>
+            </div>
+        </div>
+
+        <!-- 범례 -->
+        <div class="mb-6 bg-white rounded-lg shadow-sm p-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3 text-center">범례</h4>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-xs">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-purple-100 border border-purple-300 rounded mr-2"></div>
+                    <span>[팻머스] 근무지</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-100 border border-blue-300 rounded mr-2"></div>
+                    <span>[백석] 근무지</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-yellow-200 border border-yellow-400 rounded mr-2"></div>
+                    <span>특별 근무 (승범: 금요일 [팻머스], 창본: 화수목금 [백석])</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-gray-100 border border-gray-300 rounded mr-2"></div>
+                    <span>정규 근무</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 출근자 표 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table id="attendance-table" class="attendance-table w-full">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="date-cell text-left">날짜</th>
+                            <th class="text-left p-4">출근자 현황</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- 동적으로 생성됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 요약 통계 -->
+        <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">8월 요약 통계</h3>
+            <div id="summary-stats" class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                <!-- 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 8월 휴가 데이터 (8/4~8/29 관련만)
+        const vacationData = {
+            "2025-08-07": [{"name": "박지원", "type": "연차", "duration": 2}],
+            "2025-08-08": [{"name": "박지원", "type": "연차", "duration": 2}, {"name": "안호영", "type": "연차", "duration": 3}, {"name": "정지수", "type": "연차", "duration": 1}],
+            "2025-08-11": [{"name": "김명진", "type": "연차", "duration": 3}, {"name": "안호영", "type": "연차", "duration": 3}, {"name": "김다애", "type": "연차", "duration": 2}],
+            "2025-08-12": [{"name": "김명진", "type": "연차", "duration": 3}, {"name": "안호영", "type": "연차", "duration": 3}, {"name": "김다애", "type": "연차", "duration": 2}],
+            "2025-08-13": [{"name": "김명진", "type": "연차", "duration": 3}, {"name": "김새록", "type": "연차", "duration": 2}],
+            "2025-08-14": [{"name": "박지원", "type": "연차", "duration": 1}, {"name": "김수경", "type": "연차", "duration": 1}, {"name": "김새록", "type": "연차", "duration": 2}, {"name": "이형노", "type": "연차", "duration": 1}, {"name": "조슬기", "type": "연차", "duration": 2}],
+            "2025-08-18": [{"name": "김수경", "type": "연차", "duration": 2}, {"name": "조슬기", "type": "연차", "duration": 2}],
+            "2025-08-19": [{"name": "김수경", "type": "연차", "duration": 2}],
+            "2025-08-20": [{"name": "정지수", "type": "연차", "duration": 3}, {"name": "신선영", "type": "연차", "duration": 3}],
+            "2025-08-21": [{"name": "정지수", "type": "연차", "duration": 3}, {"name": "신선영", "type": "연차", "duration": 3}, {"name": "김명진", "type": "연차", "duration": 2}, {"name": "이형노", "type": "연차", "duration": 2}],
+            "2025-08-22": [{"name": "정지수", "type": "연차", "duration": 3}, {"name": "신선영", "type": "연차", "duration": 3}, {"name": "김명진", "type": "연차", "duration": 2}, {"name": "이형노", "type": "연차", "duration": 2}],
+            "2025-08-25": [{"name": "김다애", "type": "연차", "duration": 2}, {"name": "안호영", "type": "연차", "duration": 2}, {"name": "이예은", "type": "연차", "duration": 2}],
+            "2025-08-26": [{"name": "김다애", "type": "연차", "duration": 2}, {"name": "안호영", "type": "연차", "duration": 2}, {"name": "이예은", "type": "연차", "duration": 2}],
+            "2025-08-29": [{"name": "이예은", "type": "연차", "duration": 1}, {"name": "조슬기", "type": "연차", "duration": 1}]
+        };
+
+        // 직원 명단
+        const employees = {
+            P: ['혜미', '슬기', '명진', '지수', '다애', '예은', '성민'],
+            B: ['지원', '선영', '새록', '수경', '호영', '형노']
+        };
+
+        // 이름 매핑
+        const nameMapping = {
+            '혜미': '한혜미', '슬기': '조슬기', '명진': '김명진', '지수': '정지수',
+            '다애': '김다애', '예은': '이예은', '지원': '박지원', '선영': '신선영',
+            '새록': '김새록', '수경': '김수경', '호영': '안호영', '형노': '이형노'
+        };
+
+        function formatDate(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function isHoliday(year, month, day) {
+            const dateStr = formatDate(year, month, day);
+            return dateStr === '2025-08-15'; // 광복절
+        }
+
+        // 특별 근무자 체크
+        function getSpecialEmployees(year, month, day) {
+            const date = new Date(year, month, day);
+            const dayOfWeek = date.getDay();
+            
+            const special = { P: [], B: [] };
+            
+            // 매주 금요일 P에 승범 추가
+            if (dayOfWeek === 5) {
+                special.P.push('승범');
+            }
+            
+            // 8월 마지막 주 제외하고 화수목금 B에 창본 추가
+            if (dayOfWeek >= 2 && dayOfWeek <= 5) { // 화수목금
+                const isLastWeekOfAugust = month === 7 && day >= 25; // 8월 마지막 주
+                if (!isLastWeekOfAugust) {
+                    special.B.push('창본');
+                }
+            }
+            
+            return special;
+        }
+
+        // 해당 날짜의 휴가자 가져오기
+        function getVacationersForDate(year, month, day) {
+            const dateStr = formatDate(year, month, day);
+            const vacations = vacationData[dateStr] || [];
+            return vacations.map(v => v.name);
+        }
+
+        // 출근자 명단 생성
+        function getAttendanceForDate(year, month, day) {
+            const vacationers = getVacationersForDate(year, month, day);
+            const special = getSpecialEmployees(year, month, day);
+            
+            const attendance = { P: [], B: [] };
+            
+            // 각 근무지별로 출근자 계산
+            ['P', 'B'].forEach(location => {
+                // 정규 직원 중 휴가가 아닌 사람들
+                employees[location].forEach(employee => {
+                    const fullName = nameMapping[employee];
+                    if (!vacationers.includes(fullName)) {
+                        attendance[location].push({ name: employee, type: 'normal' });
+                    }
+                });
+                
+                // 특별 근무자 추가
+                special[location].forEach(employee => {
+                    attendance[location].push({ name: employee, type: 'special' });
+                });
+            });
+            
+            return attendance;
+        }
+
+        // 출근자 표 렌더링
+        function renderAttendanceTable() {
+            const year = 2025;
+            const month = 7; // 8월 (0-based)
+            
+            let tableHTML = '';
+            let totalWorkdays = 0;
+            let totalVacationDays = 0;
+            let attendanceByLocation = { P: 0, B: 0 };
+            
+            // 8월 4일부터 29일까지
+            for (let day = 4; day <= 29; day++) {
+                const date = new Date(year, month, day);
+                const dayOfWeek = date.getDay();
+                
+                // 주말과 공휴일 제외
+                if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+                if (isHoliday(year, month, day)) continue;
+                
+                totalWorkdays++;
+                
+                const attendance = getAttendanceForDate(year, month, day);
+                const vacationers = getVacationersForDate(year, month, day);
+                const totalAttendance = attendance.P.length + attendance.B.length;
+                
+                attendanceByLocation.P += attendance.P.length;
+                attendanceByLocation.B += attendance.B.length;
+                totalVacationDays += vacationers.length;
+                
+                const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+                
+                tableHTML += `
+                    <tr class="date-row">
+                        <td class="date-cell">
+                            <div class="font-bold">8/${day}</div>
+                            <div class="text-sm text-gray-600">(${dayNames[dayOfWeek]})</div>
+                        </td>
+                        <td class="attendance-cell">
+                            <div class="stats-info">
+                                <span class="text-green-600">✅ 출근: ${totalAttendance}명</span>
+                                <span class="text-red-600">🏖️ 휴가: ${vacationers.length}명</span>
+                            </div>
+                            
+                            <div class="location-section">
+                                <div class="location-header location-p">[팻머스] ${attendance.P.length}명</div>
+                                <div class="employee-list">
+                                    ${attendance.P.map(emp => 
+                                        `<span class="employee-tag ${emp.type === 'special' ? 'employee-special' : 'employee-normal'}">${emp.name}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="location-section">
+                                <div class="location-header location-b">[백석] ${attendance.B.length}명</div>
+                                <div class="employee-list">
+                                    ${attendance.B.map(emp => 
+                                        `<span class="employee-tag ${emp.type === 'special' ? 'employee-special' : 'employee-normal'}">${emp.name}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            
+                            ${vacationers.length > 0 ? `
+                                <div class="vacation-info">
+                                    🏖️ 휴가자: ${vacationers.join(', ')}
+                                </div>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            document.getElementById('table-body').innerHTML = tableHTML;
+            
+            // 요약 통계 업데이트
+            const avgAttendanceP = Math.round(attendanceByLocation.P / totalWorkdays);
+            const avgAttendanceB = Math.round(attendanceByLocation.B / totalWorkdays);
+            const avgVacation = Math.round(totalVacationDays / totalWorkdays);
+            
+            document.getElementById('summary-stats').innerHTML = `
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600">${totalWorkdays}일</div>
+                    <div class="text-green-700 text-sm">총 근무일</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-purple-600">${avgAttendanceP}명</div>
+                    <div class="text-purple-700 text-sm">평균 [팻머스] 출근</div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">${avgAttendanceB}명</div>
+                    <div class="text-blue-700 text-sm">평균 [백석] 출근</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-red-600">${avgVacation}명</div>
+                    <div class="text-red-700 text-sm">평균 휴가자</div>
+                </div>
+            `;
+        }
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAttendanceTable();
+        });
+    </script>
+</body>
+</html>
