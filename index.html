@@ -159,9 +159,10 @@
             <h1 class="main-title text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                 📋 8월 출근자 명단
             </h1>
-            <p class="text-sm sm:text-base text-gray-600">2025년 8월 4일 ~ 8월 29일 </p>
+            <p class="text-sm sm:text-base text-gray-600">2025년 8월 4일 ~ 8월 29일 (평일만)</p>
             <div class="mt-4 flex items-center justify-center">
                 <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                <span class="text-green-700 font-semibold text-sm">팻머스 실제 데이터</span>
             </div>
         </div>
 
@@ -240,10 +241,10 @@
                 special.P.push('승범');
             }
             
-            // 8월 마지막 주 제외하고 화수목금 B에 창본 추가
+            // 8월 12일~14일 제외하고 화수목금 B에 창본 추가
             if (dayOfWeek >= 2 && dayOfWeek <= 5) { // 화수목금
-                const isLastWeekOfAugust = month === 7 && day >= 25; // 8월 마지막 주
-                if (!isLastWeekOfAugust) {
+                const isExcludedDates = month === 7 && day >= 12 && day <= 14; // 8월 12일~14일
+                if (!isExcludedDates) {
                     special.B.push('창본');
                 }
             }
